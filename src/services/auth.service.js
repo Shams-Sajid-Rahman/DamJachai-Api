@@ -71,7 +71,7 @@ export async function rotateRefreshToken(token, { userAgent } = {}) {
     throw ApiError.unauthorized('Invalid or expired refresh token', 'REFRESH_INVALID');
   }
 
-  return withTransaction(async (client) => {
+  const outcome = await withTransaction(async (client) => {
     const { rows } = await client.query(
       `SELECT rt.id, rt.user_id, rt.revoked, rt.revoked_at, rt.expires_at,
               u.id AS uid, u.name, u.email, u.role, u.is_active, u.created_at
@@ -95,7 +95,8 @@ export async function rotateRefreshToken(token, { userAgent } = {}) {
           [stored.user_id],
         );
       }
-      throw ApiError.unauthorized('Refresh token was already used', 'REFRESH_REUSED');
+      // Return instead of throwing, so the transaction commits the revocation above.
+      return { reused: true };
     }
 
     if (new Date(stored.expires_at) < new Date()) {
@@ -122,6 +123,9 @@ export async function rotateRefreshToken(token, { userAgent } = {}) {
       refreshExpiresAt: next.expiresAt,
     };
   });
+
+  if (outcome.reused) throw ApiError.unauthorized('Refresh token was already used', 'REFRESH_REUSED');
+  return outcome;
 }
 
 export async function revokeRefreshToken(token) {
