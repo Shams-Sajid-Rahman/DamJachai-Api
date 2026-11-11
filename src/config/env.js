@@ -17,6 +17,9 @@ const envSchema = z.object({
   // Use "none" (with HTTPS) if they are on different sites.
   COOKIE_SAMESITE: z.enum(['lax', 'strict', 'none']).default('lax'),
   CLIENT_URL: z.url().default('http://localhost:5173'),
+  // Number of reverse proxies in front of the API (e.g. 1 behind Nginx). Keep 0 when the API is reached directly,
+  // otherwise clients could fake X-Forwarded-For and dodge the rate limits.
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
   // Used only by the seed script to create the first admin.
   ADMIN_NAME: z.string().min(1).max(100).default('Site Admin'),
   ADMIN_EMAIL: z.email().optional(),
