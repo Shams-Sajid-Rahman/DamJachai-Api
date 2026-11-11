@@ -9,6 +9,10 @@ const envSchema = z.object({
   JWT_ACCESS_SECRET: z.string().optional(),
   JWT_REFRESH_SECRET: z.string().optional(),
   CLIENT_URL: z.url().default('http://localhost:5173'),
+  // Used only by the seed script to create the first admin.
+  ADMIN_NAME: z.string().min(1).max(100).default('Site Admin'),
+  ADMIN_EMAIL: z.email().optional(),
+  ADMIN_PASSWORD: z.string().min(10, 'ADMIN_PASSWORD must be at least 10 characters').optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
