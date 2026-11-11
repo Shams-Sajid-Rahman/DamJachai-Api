@@ -11,7 +11,7 @@
     "seed": "node src/db/seeds/seed.js",
     "db:create": "node src/db/create.js",
     "db:reset": "node src/db/reset.js",
-    "test": "node --experimental-vm-modules --no-warnings ../node_modules/jest/bin/jest.js --runInBand"
+    "test": "node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js --runInBand"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
